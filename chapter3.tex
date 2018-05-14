@@ -1,0 +1,26 @@
+\chapter{Method Overview}
+
+\section{Overview of Notations}
+
+Our approach classification without using gradient based methods is to create multiple hash representations of the training features and then to store these features mapped to its original class in the training set. When predicting an objects class we create the same hash representations of the object’s features and count the number of collisions. By storing the outputs each hashfunction in its own hashmap or node, we can observe the performance of each individual hash function to train filters within the hash function rather than using a CNN or convoluted neural network. A hash node $N$ has 3 parts- one hash function, one hashmap, and a prediction function. 
+
+A typical hash function $h(x)$ or $h(x; S_n, F_n, T_n)$ will have 4 components where $x$ is the training observation, $S_n$ is a sampling parameter describing how to break down an observation into smaller pieces, $F_n$ is a filtering parameter describing how to filter emphasize certain features of the data, and $B_n$ is a Bootstrap parameter a non-random way to parametrically generate more versions of the data to get more hash keys if the training set is limited. Given an observation $X_i$ a hash function will generate hashes: $\{h_{1:n}, h_{2:n}, ... h_{i:n}\}$ where $i$ corresponds to the index of the observation and $n$ respresents the corresponding hashnode. In the simple case, the hashes are then stored in a hashmap $\{ h_{i:n}$ (generated from $h(x)$)$: C_i \}$ where $h_{i:n}$ is the row key and $C_i$ is the class of the observation from the training set stored as the value to the key. A prediction function $pred(x)$ is then used to generate prediction output from a new observation $x$ from the test set. Thus we can model the probability of each observation to be of a certain class as:
+
+\begin{equation}P(C = c | x_i ) = \frac{ \textrm{\# of Values }(V) = c}{ \textrm{\# of Values }(V) \neq c }\end{equation}
+
+Where $V$ is class values attained when quering a hashmap $M(h)$ from the prediction hashes generated: $\{h_1, h_2, h_3 ...\}$
+
+\section{Overview of Process}
+
+The Overall Method is: 
+
+\begin{enumerate}
+\item{For dataset $X = \{x_1, x_2, ... x_i\}$ generate hashes $H = \{h_{1:n}, h_{2:n}, ... h_{i:n}\}$ from $h(x)$ in node $N$ : $\{N_1, N_2, ... N_n\}$ with arbirary or randomly generated paramters $ S_n, F_n, T_n $}
+\item{If data is small, generate $H' = \{h'_{1:n}, h'_{2:n}, h'_{3:n}, ...\}$ through parametric bootstrap of the original hash set $H$ for each node and store the in the corresponding node's hashmap.}
+\item{Predict $\{c_1,c_2, ... c_i \}$ classes from each hash node}
+\item{Do a simple vote between each of the hashnodes for the final prediction = $C_{i; pred}$ or use a boosting method to aggregate the predictions}
+\item{Rank each node in terms of performance and calculate the correlations between the predicts of each node to create a set of N top nodes combining or removing nodes that are too similar or perform badly.}
+\item{Add and train new nodes with randomly set filters and parameters as neccessary}
+\end{enumerate}
+
+
